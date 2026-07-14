@@ -1,0 +1,8 @@
+com.studioszee.studiolitemobile.app-pngs-0 /home/zee/AndroidStudioProjects/StudioLiteMobile/app/build/generated/res/pngs/release
+com.studioszee.studiolitemobile.app-updated_navigation_xml-1 /home/zee/AndroidStudioProjects/StudioLiteMobile/app/build/generated/updated_navigation_xml/release
+com.studioszee.studiolitemobile.app-packageReleaseResources-2 /home/zee/AndroidStudioProjects/StudioLiteMobile/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.studioszee.studiolitemobile.app-packageReleaseResources-3 /home/zee/AndroidStudioProjects/StudioLiteMobile/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.studioszee.studiolitemobile.app-release-4 /home/zee/AndroidStudioProjects/StudioLiteMobile/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.studioszee.studiolitemobile.app-main-5 /home/zee/AndroidStudioProjects/StudioLiteMobile/app/src/main/res
+com.studioszee.studiolitemobile.app-release-6 /home/zee/AndroidStudioProjects/StudioLiteMobile/app/src/release/res
+gradleHome-0 /home/zee/.gradle

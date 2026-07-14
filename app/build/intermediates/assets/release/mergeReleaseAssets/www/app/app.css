@@ -1,0 +1,526 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    --window-background-color: #805ba5;
+}
+
+dialog {
+    background-color: #ffffffff;
+    border: none;
+    padding: 0;
+}
+
+.rightPane {
+    height: calc(100vh - 29px - 29px - 27px + 4px);
+    width: var(--workspace-right-width, 400px);
+    position: absolute;
+    top: 56px;
+    left: calc(100vw - var(--workspace-right-width, 400px));
+    background-color: white;
+    overflow: hidden;
+    z-index: 2;
+    transition: width 240ms ease, left 240ms ease, opacity 180ms ease, transform 240ms ease;
+}
+
+/* mobile toolbar */
+.mobile-toolbar {
+    display: none;
+}
+
+.mobile-toolbar .mobile-btn {
+    padding: 10px 12px;
+    font-size: 16px;
+    border: none;
+    background: var(--control-background, #eee);
+    flex: 1 1 auto;
+    transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.mobile-btn.active {
+    background: var(--progress-color-paused, #ffd54f);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) inset;
+}
+
+/* Mobile movement controls (virtual joystick) */
+.mobile-movement-controls {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 12px;
+    z-index: 9999;
+    user-select: none;
+}
+
+.joystick-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+/* D-Pad joystick layout */
+.joystick-analog {
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(100, 150, 255, 0.3), rgba(100, 150, 255, 0.1));
+    border: 3px solid rgba(100, 150, 255, 0.5);
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    user-select: none;
+    box-shadow: inset 0 0 12px rgba(100, 150, 255, 0.2);
+}
+
+.joystick-inner {
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle at 30% 30%, rgba(100, 180, 255, 0.8), rgba(60, 120, 220, 0.9));
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    position: absolute;
+    transition: all 60ms linear;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.joystick-inner.active {
+    box-shadow: 0 2px 12px rgba(100, 150, 255, 0.6);
+}
+
+.joystick-side {
+    display: flex;
+    gap: 6px;
+    padding: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+}
+
+.vertical-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.zoom-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding-left: 6px;
+}
+
+.movement-btn,
+.zoom-btn {
+    width: 42px;
+    height: 42px;
+    padding: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 120ms ease, transform 80ms ease, box-shadow 120ms ease;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.movement-btn:active,
+.zoom-btn:active {
+    background: rgba(255, 200, 100, 0.9);
+    transform: scale(0.95);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) inset;
+}
+
+.movement-btn.pressed,
+.zoom-btn.pressed {
+    background: rgba(255, 180, 50, 0.95);
+}
+
+.zoom-btn {
+    font-size: 20px;
+}
+
+/* Show movement controls when in a scene (both mobile and desktop) */
+body.ui-loaded .mobile-movement-controls {
+    display: flex;
+}
+
+.desktop-toolbar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.desktop-toolbar .desktop-btn {
+    padding: 4px 8px;
+    font-size: 13px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.desktop-toolbar .desktop-btn.active {
+    background: var(--control-background, #e6e6e6);
+    border-radius: 3px;
+}
+
+/* hide desktop toolbar on small screens (mobile) */
+@media (max-width: 767px) {
+    .desktop-toolbar {
+        display: none;
+    }
+}
+
+/* utility class to hide panels via JS/CSS */
+.panel-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.rightPane.panel-hidden {
+    transform: translateX(14px);
+}
+
+.console.panel-hidden {
+    transform: translateY(14px);
+}
+
+.console {
+    position: absolute;
+    height: calc(var(--workspace-console-height, 200px) - 22px);
+    width: calc(100vw - var(--workspace-right-width, 400px));
+    top: calc(100vh - var(--workspace-console-height, 200px) - 6px);
+    background-color: white;
+    overflow: hidden;
+    transition: width 240ms ease, height 240ms ease, top 240ms ease, opacity 180ms ease, transform 240ms ease;
+}
+
+.title {
+    height: 20px;
+    padding: 5px;
+    border-bottom: 5px solid black;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.title-bar-text {
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.tree,
+.tree2,
+.properties {
+    --height: calc(50vh - 29px - 14.5px - 17px - 13.5px - 6px + 2px);
+    overflow: scroll;
+    width: 385px;
+}
+
+.tree,
+.tree2 {
+    height: calc(var(--height) - 23px);
+}
+
+.properties {
+    height: var(--height);
+}
+
+table {
+    min-width: 100%;
+}
+
+th,
+td {
+    text-align: left;
+}
+
+/* taken from 7.css "highlighted" rule */
+table>tbody>tr:hover {
+    background: var(--item-highlighted-background);
+    border: var(--listview-border) var(--item-highlighted-border);
+    border-radius: var(--border-radius);
+}
+
+.message,
+.onboarding {
+    position: absolute;
+    width: calc(100vw - var(--workspace-right-width, 400px));
+    height: calc(100vh - var(--workspace-console-height, 200px) - 29px - 29px);
+    background-color: rgba(221, 221, 221, .5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    font-size: clamp(16px, 1.8vw, 22px);
+    text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000,
+        1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+    cursor: url(../content/Textures/ArrowFarCursor.png), auto;
+    box-sizing: border-box;
+    padding: 16px;
+    transition: width 240ms ease, height 240ms ease, opacity 180ms ease, transform 240ms ease;
+}
+
+.onboarding {
+    flex-direction: column;
+}
+
+.onboarding>h1 {
+    width: fit-content;
+    max-width: 100%;
+    font-size: clamp(24px, 4vw, 44px);
+    line-height: 1.1;
+}
+
+.onboarding>button {
+    font-size: clamp(18px, 3vw, 32px);
+}
+
+.onboarding> :is(button, input, label),
+#stats,
+#stats>* {
+    cursor: url(../content/Textures/ArrowCursor.png), auto !important;
+}
+
+.editor {
+    position: absolute;
+    width: calc(100vw - var(--workspace-right-width, 400px) - 10px);
+    height: calc(100vh - var(--workspace-console-height, 200px) - 215px - 29px - 29px);
+    background-color: white;
+    color: black;
+    padding: 5px;
+    font-size: 22px;
+    font-family: monospace;
+    overflow: scroll;
+    z-index: 10001;
+    transition: width 240ms ease, height 240ms ease, opacity 180ms ease, transform 240ms ease;
+}
+
+.log {
+    height: calc(100% - 35px);
+    width: calc(100% - 12px);
+    overflow: scroll;
+    font-family: monospace;
+    font-size: 18px;
+}
+
+pre {
+    border: none;
+}
+
+body>.title-bar {
+    position: absolute;
+    width: calc(100vw - 14px);
+    z-index: 10002;
+    top: 0;
+    left: 0;
+    transition: opacity 180ms ease, transform 240ms ease;
+}
+
+body>ul[role=menubar] {
+    position: absolute;
+    top: 29px;
+    left: 0;
+    width: 100vw;
+    z-index: 10002;
+    transition: opacity 180ms ease, transform 240ms ease;
+}
+
+/* Responsive adjustments for mobile devices */
+@media (max-width: 767px) {
+    .mobile-toolbar {
+        display: flex;
+        position: fixed;
+        bottom: 25px;
+        left: 0;
+        width: 100vw;
+        z-index: 10003;
+        gap: 4px;
+        padding: 6px;
+        box-sizing: border-box;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .rightPane {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: var(--workspace-right-width, 100vw);
+        height: calc(100vh - 56px - 80px);
+        z-index: 10002;
+    }
+
+    .console {
+        position: fixed;
+        bottom: 56px;
+        left: 0;
+        width: calc(100vw - var(--workspace-right-width, 0px));
+        height: calc(40vh);
+        z-index: 10002;
+    }
+
+    /* make tree/properties full width */
+    .tree,
+    .tree2,
+    .properties {
+        width: calc(100vw - 20px);
+    }
+
+    .editor {
+        width: 100vw;
+        left: 0;
+    }
+}
+
+body.ui-compact .mobile-toolbar,
+body.ui-compact .desktop-toolbar,
+body.ui-compact .status-bar,
+body.ui-compact>ul[role=menubar] {
+    display: none !important;
+}
+
+body.ui-compact canvas {
+    margin-top: 0;
+}
+
+body.ui-compact .title-bar {
+    opacity: 1;
+    transform: none;
+}
+
+body.ui-compact .message,
+body.ui-compact .onboarding {
+    font-size: clamp(14px, 1.6vw, 18px);
+}
+
+body.ui-compact .onboarding>h1 {
+    font-size: clamp(20px, 3vw, 34px);
+}
+
+body.ui-compact .onboarding>button {
+    font-size: clamp(16px, 2.5vw, 24px);
+}
+
+canvas {
+    margin-top: 58px;
+    cursor: url(../content/Textures/ArrowFarCursor.png), auto;
+    transition: width 240ms ease, height 240ms ease, margin-top 240ms ease;
+}
+
+.status-bar {
+    position: absolute;
+    top: calc(100vh - 27px);
+    width: calc(100vw - 2px);
+    margin: 0;
+    z-index: 3;
+}
+
+.flexcenter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-bar-field>*[role=progressbar] {
+    width: 100%;
+}
+
+.marquee.error:before {
+    background: linear-gradient(to right, transparent, var(--progress-color-error), transparent 35%);
+}
+
+/* yellow is not for paused, but for fetching :) */
+.marquee.paused:before {
+    background: linear-gradient(to right, transparent, var(--progress-color-paused), transparent 35%);
+}
+
+.title-bar-icon {
+    padding-left: 20px;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+}
+
+.icon-studio {
+    background-image: url(../content/icons/StudioService.png);
+}
+
+#notepad .window-body {
+    width: 700px;
+    height: 400px;
+}
+
+#notepad textarea {
+    width: 100%;
+    height: calc(100% - 29px);
+    resize: none;
+    font-size: 16px;
+    font-family: monospace;
+}
+
+.title-bar,
+.status-bar-field {
+    height: 21px;
+}
+
+*[role=menubar] {
+    height: 29px;
+}
+
+.status-bar {
+    height: 25px;
+}
+
+.title-bar,
+*[role=menubar],
+*[role=tablist],
+.tree2,
+.message,
+.onboarding,
+.tree,
+td:first-child,
+.status-bar {
+    user-select: none;
+}
+
+.menu[role=tablist] {
+    height: 23px;
+}
+
+.github {
+    color: black;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    text-shadow: 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff;
+}
+
+.github::before {
+    background: none !important;
+}
+
+.title-bar.active .github,
+.title-bar.active .github::before {
+    background: var(--control-background) !important;
+}
+
+html, body, canvas {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+}

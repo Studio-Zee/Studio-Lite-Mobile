@@ -1,0 +1,14 @@
+com.studioszee.studiolitemobile
+color black
+color white
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+id webView
+layout activity_main
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+style Base_Theme_StudioLiteMobile
+style Theme_StudioLiteMobile
+xml backup_rules
+xml data_extraction_rules
